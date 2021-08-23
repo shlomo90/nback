@@ -13,6 +13,12 @@ import contextlib
 import signal
 from select import select
 
+from error import (
+    ERR_INPUT_NBACK_OVERMAX, ERR_INPUT_NBACK_NO_INPUT, ERR_INPUT_NBACK_NOT_INT,
+    ERR_INPUT_NBACK_INVALID, ERR_INPUT_NBACK_LESS_THEN_NBACK,
+    InputError, SignalAlarmTimeOut,
+)
+
 
 DEFAULT_RANGE = 4
 DEFAULT_TIME = 2
@@ -24,20 +30,6 @@ MSG_CONFIRM = "If it's matched, Press 'y' otherwise, Press 'n': "
 
 MAX_NBACK = 100
 MAX_TOTAL = MAX_NBACK + 1
-
-ERR_INPUT_NBACK_OVERMAX = "'N' is too many value (> 100)."
-ERR_INPUT_NBACK_NO_INPUT = "'N' has no value."
-ERR_INPUT_NBACK_NOT_INT = "'N' should be inteagers."
-ERR_INPUT_NBACK_INVALID = "'N' is invalid."
-ERR_INPUT_NBACK_LESS_THEN_NBACK = "'T' should be greater than 'N' value."
-
-
-class InputError(BaseException):
-    pass
-
-
-class SignalAlarmTimeOut(BaseException):
-    pass
 
 
 class NBack(object):
