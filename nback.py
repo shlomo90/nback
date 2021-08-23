@@ -20,6 +20,7 @@ from error import (
 )
 
 
+TICK = 1
 DEFAULT_RANGE = 4
 DEFAULT_TIME = 2
 DEFAULT_NBACK = 3
@@ -76,8 +77,7 @@ class NBack(object):
         return ret
 
     def setup(self):
-        ''' Setup the Nback game.
-        '''
+        ''' Setup the Nback game. '''
 
         setup_done = False
         while setup_done is False:
@@ -116,57 +116,63 @@ class NBack(object):
         print("Ready!")
         time.sleep(0.7)
 
+    def before_nback(self, answers, i, q):
+        ''' Show the numbers before 'N'th. '''
+
+        self.ready_screen(i)
+        print("{} Ready.".format(q))
+        answers.append(None)
+        time.sleep(DEFAULT_TIME)
+
+    def after_nback(self, answers, i, q):
+        ''' Show the numbers from N'th to total. '''
+
+        answer = None
+        user_answered = False
+        self.signal_alarm_set()
+        while not self.is_timeout():
+            prompt = "{} (ans:{:>4}) (time: {})".format(q, answer, self.timer)
+            self.ready_screen(i)
+
+            try:
+                if user_answered is True:
+                    self.print_message(prompt)
+                    # Blocked until waken up by signal.
+                    self.wait_alarm()
+
+                else:
+                    # Blocked until valid keys are pressed
+                    # (ex: left arrow, right arrow)
+                    # Or signal alarm timeout
+                    # (ex: 1 second)
+                    answer = self.input_side_arrows(prompt=prompt)
+                    user_answered = True
+            except SignalAlarmTimeOut:
+                self.signal_alarm_tick_down()
+                self.signal_alarm_resume()
+
+        if answer is None:
+            answers.append(None)
+        elif answer == 'yes':
+            answers.append("True")
+        else:
+            answers.append("False")
+
+        self.signal_alarm_done()
+
+    def ready_screen(self, i):
+        self.clear_screen()
+        for n in range(i):
+            print("")
+
     def game_start(self):
         answers = []
         for i, q in enumerate(self.quests):
-            self.clear_screen()
-            for n in range(i):
-                print("")
-
             # Show N-1 numbers.
             if i < self.nback:
-                print("{} Ready.".format(q))
-                answers.append(None)
-                time.sleep(DEFAULT_TIME)
-
+                self.before_nback(answers, i, q)
             else:
-                answered = False
-                answer = None
-
-                self.signal_alarm_set()
-                while not self.is_timeout():
-                    self.clear_screen()
-                    for n in range(i):
-                        print("")
-
-                    prompt = "{} (ans:{:>4}) (time: {})".format(
-                        q, answer, self.timer)
-
-                    try:
-                        if answered is True:
-                            self.print_message(prompt)
-                            # Blocked until waken up by signal.
-                            self.wait_alarm()
-
-                        else:
-                            # Blocked until valid keys are pressed
-                            # (ex: left arrow, right arrow)
-                            # Or signal alarm timeout
-                            # (ex: 1 second)
-                            answer = self.input_side_arrows(prompt=prompt)
-                            answered = True
-                    except SignalAlarmTimeOut:
-                        self.signal_alarm_tick_down()
-                        self.signal_alarm_resume()
-
-                if answer is None:
-                    answers.append(None)
-                elif answer == 'yes':
-                    answers.append("True")
-                else:
-                    answers.append("False")
-
-                self.signal_alarm_done()
+                self.after_nback(answers, i, q)
 
         time.sleep(0.1)
         self.clear_screen()
@@ -187,11 +193,10 @@ class NBack(object):
             print(score_fmt.format(quests[i], answers[i], corrects[i], result))
 
     def print_message(self, msg):
-        ''' Print a message on console.
-        '''
+        ''' Print a message on console. '''
+
         sys.stdout.write("{}".format(msg))
         sys.stdout.flush()
-        pass
 
     def quest_and_answer(self, quest, timeout=None):
         ''' Print a quest message on console and Get user's answer.
@@ -225,7 +230,6 @@ class NBack(object):
 
     def clear_screen(self):
         os.system("clear")
-        pass
 
     @contextlib.contextmanager
     def _raw_mode(self, file):
@@ -275,13 +279,13 @@ class NBack(object):
     def signal_alarm_set(self):
         self.timer = DEFAULT_TIME
         signal.signal(signal.SIGALRM, self.interrupted)
-        signal.alarm(1)
+        signal.alarm(TICK)
 
     def signal_alarm_resume(self):
-        signal.alarm(1)
+        signal.alarm(TICK)
 
     def signal_alarm_tick_down(self):
-        self.timer -= 1
+        self.timer -= TICK
 
     def signal_alarm_done(self):
         signal.alarm(0)
