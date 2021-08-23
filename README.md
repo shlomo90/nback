@@ -4,6 +4,10 @@ N-Back Game is a simple game to improve your brain.
 
 # How to play?
 
+Run the command below
+
+```python start.py```
+
 First, when you run this program, it requires a 'N' number (You can choose 1 ~ 100) and 'T' total number of requests.
 (Notes: 'T' must be greater than 'N'.) After Setting up 'N' and 'T', the main game starts!
 
@@ -14,6 +18,7 @@ or It's not, you have to input "Right Allow (->)". Don't be late to press button
 
 The result of the game shows up after the last number shows.
 You can check your scores. Enjoy the game. Thanks.
+
 
 # TODO
 
