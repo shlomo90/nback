@@ -121,7 +121,7 @@ class NBack(object):
 
         self.ready_screen(i)
         print("{} Ready.".format(q))
-        answers.append(None)
+        answers.append("----")
         time.sleep(DEFAULT_TIME)
 
     def after_nback(self, answers, i, q):
@@ -184,8 +184,8 @@ class NBack(object):
         print("")
         print("quests answers correct matched")
         for i in range(self.total):
-            if corrects[i] is None:
-                result = "None"
+            if corrects[i] == "----":
+                result = "----"
             elif answers[i] == corrects[i]:
                 result = "OK"
             else:
@@ -220,7 +220,7 @@ class NBack(object):
         return string
 
     def calculate_correct(self):
-        self.corrects = [None] * self.nback
+        self.corrects = ["----"] * self.nback
         after_n_quests = self.quests[self.nback:]
         for i, q in enumerate(after_n_quests):
             if self.quests[i] == q:
