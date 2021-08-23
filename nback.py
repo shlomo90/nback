@@ -128,6 +128,8 @@ class NBack(object):
         answers = []
         for i, q in enumerate(self.quests):
             self.clear_screen()
+            for n in range(i):
+                print("")
 
             # Show N-1 numbers.
             if i < self.nback:
@@ -142,6 +144,9 @@ class NBack(object):
                 self.signal_alarm_set()
                 while not self.is_timeout():
                     self.clear_screen()
+                    for n in range(i):
+                        print("")
+
                     prompt = "{} (ans:{:>4}) (time: {})".format(
                         q, answer, self.timer)
 
@@ -172,6 +177,7 @@ class NBack(object):
                 self.signal_alarm_done()
 
         time.sleep(0.1)
+        self.clear_screen()
         self.game_result(self.quests, answers, self.corrects)
 
     def game_result(self, quests, answers, corrects):
